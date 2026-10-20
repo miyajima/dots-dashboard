@@ -1,0 +1,1 @@
+ALTER TABLE `board_tasks` ADD `request_fingerprint` text DEFAULT '' NOT NULL;

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "record": {
+    "teamId": "synthetic-team",
+    "operationId": "synthetic-op",
+    "expectedRevision": 7,
+    "stepId": "synthetic-implementation",
+    "fence": 1,
+    "state": "launch_unknown",
+    "observedAt": 10000,
+    "summary": "Synthetic unknown launch",
+    "blocker": null,
+    "evidence": []
+  },
+  "cloudRun": {
+    "runId": "synthetic-run",
+    "specSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "generation": 1,
+    "dispatchId": "synthetic-dispatch",
+    "attemptId": "synthetic-attempt",
+    "executionId": null,
+    "targetDispatchId": "synthetic-dispatch",
+    "targetAttemptId": "synthetic-attempt",
+    "implementationExecutionId": null,
+    "executionIdentityStatus": "not_observed",
+    "exactCommit": null,
+    "exactTree": null,
+    "hostRevision": 0,
+    "gate": null,
+    "binding": {
+      "taskId": "worker",
+      "environmentId": "synthetic-cloud",
+      "execution": "cloud"
+    },
+    "lead": {
+      "taskId": "lead",
+      "environmentId": "synthetic-lead-cloud",
+      "execution": "cloud"
+    },
+    "executionMode": "cloud",
+    "unitComplete": false,
+    "judgments": []
+  }
+}

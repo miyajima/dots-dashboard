@@ -1,0 +1,313 @@
+{
+  "contractVersion": 2,
+  "offlineOnly": true,
+  "serverPolicy": [
+    {
+      "environmentConfigId": "cloud_env_fixture",
+      "executorType": "codex_cloud"
+    },
+    {
+      "environmentConfigId": "cloud_review_fixture",
+      "executorType": "codex_cloud"
+    }
+  ],
+  "create": {
+    "version": 2,
+    "operationId": "fixture_create_team",
+    "taskId": "task_parent_fixture",
+    "sourceMessageId": "source_parent_fixture",
+    "lead": {
+      "taskId": "cloud_lead_fixture",
+      "executorType": "codex_cloud",
+      "environmentConfigId": "cloud_env_fixture"
+    },
+    "steps": [
+      {
+        "id": "implement_fixture",
+        "role": "implementation",
+        "title": "Implement",
+        "dependencies": [],
+        "completionCriteria": "Regression at exact commit/tree"
+      },
+      {
+        "id": "verifier_fixture",
+        "role": "verifier",
+        "title": "Review",
+        "dependencies": [
+          "implement_fixture"
+        ],
+        "completionCriteria": "Independent same attempt and commit/tree evidence"
+      }
+    ]
+  },
+  "records": [
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_implement_claimed",
+      "expectedRevision": 1,
+      "stepId": "implement_fixture",
+      "fence": 0,
+      "dispatchId": "dispatch_implement_fixture",
+      "attemptId": "attempt_implement_fixture",
+      "generation": 1,
+      "state": "claimed",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture claimed",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "dispatchIntent": {
+        "dispatchId": "dispatch_implement_fixture",
+        "attemptId": "attempt_implement_fixture",
+        "generation": 1,
+        "ownerRunId": "cloud_lead_fixture",
+        "executorType": "codex_cloud",
+        "environmentConfigId": "cloud_env_fixture",
+        "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_implement_running",
+      "expectedRevision": 2,
+      "stepId": "implement_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_implement_fixture",
+      "attemptId": "attempt_implement_fixture",
+      "generation": 1,
+      "state": "running",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture running",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "binding": {
+        "taskId": "cloud_worker_fixture",
+        "executorType": "codex_cloud",
+        "environmentConfigId": "cloud_env_fixture",
+        "environmentInstanceId": "cloud_instance_fixture"
+      }
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_implement_verifying",
+      "expectedRevision": 3,
+      "stepId": "implement_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_implement_fixture",
+      "attemptId": "attempt_implement_fixture",
+      "generation": 1,
+      "state": "verifying",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture verifying",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_implement_succeeded",
+      "expectedRevision": 4,
+      "stepId": "implement_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_implement_fixture",
+      "attemptId": "attempt_implement_fixture",
+      "generation": 1,
+      "state": "succeeded",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture succeeded",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_verifier_claimed",
+      "expectedRevision": 5,
+      "stepId": "verifier_fixture",
+      "fence": 0,
+      "dispatchId": "dispatch_verifier_fixture",
+      "attemptId": "attempt_verifier_fixture",
+      "generation": 1,
+      "state": "claimed",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture claimed",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "dispatchIntent": {
+        "dispatchId": "dispatch_verifier_fixture",
+        "attemptId": "attempt_verifier_fixture",
+        "generation": 1,
+        "ownerRunId": "cloud_lead_fixture",
+        "executorType": "codex_cloud",
+        "environmentConfigId": "cloud_review_fixture",
+        "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+      },
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc",
+      "verificationTargets": [
+        {
+          "stepId": "implement_fixture",
+          "dispatchId": "dispatch_implement_fixture",
+          "attemptId": "attempt_implement_fixture",
+          "generation": 1,
+          "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_verifier_running",
+      "expectedRevision": 6,
+      "stepId": "verifier_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_verifier_fixture",
+      "attemptId": "attempt_verifier_fixture",
+      "generation": 1,
+      "state": "running",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture running",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "binding": {
+        "taskId": "cloud_verifier_fixture",
+        "executorType": "codex_cloud",
+        "environmentConfigId": "cloud_review_fixture",
+        "environmentInstanceId": "review_instance_fixture"
+      },
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc",
+      "verificationTargets": [
+        {
+          "stepId": "implement_fixture",
+          "dispatchId": "dispatch_implement_fixture",
+          "attemptId": "attempt_implement_fixture",
+          "generation": 1,
+          "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_verifier_verifying",
+      "expectedRevision": 7,
+      "stepId": "verifier_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_verifier_fixture",
+      "attemptId": "attempt_verifier_fixture",
+      "generation": 1,
+      "state": "verifying",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture verifying",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc",
+      "verificationTargets": [
+        {
+          "stepId": "implement_fixture",
+          "dispatchId": "dispatch_implement_fixture",
+          "attemptId": "attempt_implement_fixture",
+          "generation": 1,
+          "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "teamId": "team_contract_fixture",
+      "operationId": "fixture_verifier_succeeded",
+      "expectedRevision": 8,
+      "stepId": "verifier_fixture",
+      "fence": 1,
+      "dispatchId": "dispatch_verifier_fixture",
+      "attemptId": "attempt_verifier_fixture",
+      "generation": 1,
+      "state": "succeeded",
+      "observedAt": "2026-10-08T01:00:00.000Z",
+      "summary": "Offline fixture succeeded",
+      "blocker": "",
+      "blockerType": "none",
+      "evidence": [
+        "Synthetic offline evidence; never a real execution receipt"
+      ],
+      "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "exactTree": "cccccccccccccccccccccccccccccccccccccccc",
+      "verificationTargets": [
+        {
+          "stepId": "implement_fixture",
+          "dispatchId": "dispatch_implement_fixture",
+          "attemptId": "attempt_implement_fixture",
+          "generation": 1,
+          "exactCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "exactTree": "cccccccccccccccccccccccccccccccccccccccc"
+        }
+      ]
+    }
+  ],
+  "approvalIsolation": {
+    "first": {
+      "approvalRequestId": "approval_first_fixture",
+      "waitGeneration": 1,
+      "outcome": "approved",
+      "evidence": [
+        "Synthetic first native receipt"
+      ]
+    },
+    "secondPending": {
+      "approvalRequestId": "approval_second_fixture",
+      "waitGeneration": 2,
+      "outcome": "pending",
+      "evidence": [
+        "Synthetic second native request"
+      ]
+    },
+    "expectedStaleFirstResult": "approval_wait_mismatch"
+  },
+  "unavailableDecision": {
+    "provider": "jev",
+    "route": "decisions_api_via_openrouter",
+    "outcome": "unavailable",
+    "budget": 0,
+    "timeoutMs": 10000,
+    "fallback": "Lead explicit judgment",
+    "rationale": "Cloud fixture has no existing OpenRouter key",
+    "unusedReason": "No key; no live provider call",
+    "evidence": [
+      "Synthetic fixture availability observation"
+    ]
+  }
+}

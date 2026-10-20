@@ -1,0 +1,13 @@
+{
+  "name": "dot-project-dashboard",
+  "private": true,
+  "scripts": {
+    "build": "python render.py && node build-worker.mjs",
+    "test": "node test-dashboard.cjs && node test-ui.cjs && node test-api.mjs && node test-chat-service.mjs && node test-chat-handler.mjs && node test-workspace.cjs && node test-events.mjs && node test-events-store.mjs && node test-events-normal.mjs && node test-task-hierarchy.mjs && node test-hierarchy-ui.cjs && node test-chat-layout.cjs && node test-message-extensions.mjs . && node test-composer-metadata.cjs && node test-shell-ui.cjs && node --test test-composer-input-contract.cjs && node test-provenance/provenance-regression.mjs && node test-provenance/provenance-handler-regression.mjs && node test-provenance/provenance-ui-regression.cjs && node --test test-mobile-picker.cjs && node test-standalone.mjs && node --test test-message-progress.cjs && node --test test-mobile-plus-menu.cjs && node --test test-request-results.mjs && node --test test-request-results-ui.cjs && node --test test-sessions.mjs test-session-ui.cjs && node --test test-source-sessions.mjs && node --test test-thread-sidebar/backend-review.mjs test-thread-sidebar/sidebar-ui-review.cjs test-thread-sidebar/shell-ui-review.cjs && node --test test-project-creation.mjs && node --test test-project-review.mjs test-project-create-ui.cjs && node --test test-project-status.mjs test-status-review.mjs test-status-ui.cjs && node --test test-agent-team.mjs && node --test test-session-performance.cjs test-performance-server.mjs test-background-refresh.cjs test-background-preferences.cjs && node --test test-codex-inventory.mjs test-codex-inventory-ui.cjs test-codex-classification.mjs && node --test test-public-configuration.mjs",
+    "db:generate": "drizzle-kit generate"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.44.0"
+  }
+}

@@ -1,0 +1,1 @@
+ALTER TABLE `project_sessions` ADD `source_room_id` text;

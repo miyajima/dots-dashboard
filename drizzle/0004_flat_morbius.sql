@@ -1,0 +1,1 @@
+ALTER TABLE `event_deliveries` ADD `terminal_reason` text;

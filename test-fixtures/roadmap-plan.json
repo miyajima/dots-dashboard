@@ -1,0 +1,61 @@
+{
+  "parentTaskId": "task_parent_fixture",
+  "planId": "synthetic_roadmap_plan",
+  "steps": [
+    {
+      "id": "evaluation-baseline",
+      "title": "Synthetic roadmap step 1",
+      "scope": "Offline synthetic fixture only",
+      "completionCriteria": "Verify explicit synthetic acceptance criteria",
+      "progressMark": "partial",
+      "progressEvidence": [
+        "Synthetic partial observation; completion remains unverified"
+      ],
+      "progressVerifiedAt": "2026-10-06T10:30:00Z"
+    },
+    {
+      "id": "loss-measurement",
+      "title": "Synthetic roadmap step 2",
+      "scope": "Offline synthetic fixture only",
+      "completionCriteria": "Verify explicit synthetic acceptance criteria",
+      "progressMark": "partial",
+      "progressEvidence": [
+        "Synthetic partial observation; completion remains unverified"
+      ],
+      "progressVerifiedAt": "2026-10-06T10:30:00Z"
+    },
+    {
+      "id": "extraction-storage",
+      "title": "Synthetic roadmap step 3",
+      "scope": "Offline synthetic fixture only",
+      "completionCriteria": "Verify explicit synthetic acceptance criteria",
+      "progressMark": "partial",
+      "progressEvidence": [
+        "Synthetic partial observation; completion remains unverified"
+      ],
+      "progressVerifiedAt": "2026-10-06T10:30:00Z"
+    },
+    {
+      "id": "japanese-search",
+      "title": "Synthetic roadmap step 4",
+      "scope": "Offline synthetic fixture only",
+      "completionCriteria": "Verify explicit synthetic acceptance criteria",
+      "progressMark": "partial",
+      "progressEvidence": [
+        "Synthetic partial observation; completion remains unverified"
+      ],
+      "progressVerifiedAt": "2026-10-06T10:30:00Z"
+    },
+    {
+      "id": "real-usage-impact",
+      "title": "Synthetic roadmap step 5",
+      "scope": "Offline synthetic fixture only",
+      "completionCriteria": "Verify explicit synthetic acceptance criteria",
+      "progressMark": "not_started",
+      "progressEvidence": [
+        "Synthetic partial observation; completion remains unverified"
+      ],
+      "progressVerifiedAt": "2026-10-06T10:30:00Z"
+    }
+  ]
+}

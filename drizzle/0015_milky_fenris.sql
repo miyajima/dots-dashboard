@@ -1,0 +1,1 @@
+ALTER TABLE `external_request_sources` ADD `session_id` text;

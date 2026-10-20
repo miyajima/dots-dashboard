@@ -1,0 +1,21 @@
+import {DatabaseSync} from 'node:sqlite';import assert from 'node:assert/strict';import {readFileSync,readdirSync} from 'node:fs';import {preferencesAPI} from './worker/preferences.mjs';
+const sql=new DatabaseSync(':memory:');for(const file of readdirSync('drizzle').filter(x=>x.endsWith('.sql')).sort())sql.exec(readFileSync('drizzle/'+file,'utf8'));
+const DB={prepare(query){return {bind(...args){return {async all(){return {results:sql.prepare(query).all(...args)}},async run(){return {meta:{changes:sql.prepare(query).run(...args).changes}}}}}}}};
+const ids=['consentside','orgbrain','localoud'];const origin='https://dashboard.example';
+async function call(user,body,extra={}){const req=new Request(origin+'/api/project-visibility',{method:body?'POST':'GET',headers:{...(user?{'oai-authenticated-user-id':user}:{}),...(body?{'Content-Type':'application/json',origin}:{}),...extra.headers},...(body?{body:JSON.stringify(body)}:{})});const res=await preferencesAPI(req,extra.env||{DB},ids);return {status:res.status,data:await res.json(),headers:res.headers}}
+const a=await call('owner');const b=await call('owner');assert.equal(a.status,200);assert.deepEqual(a.data.items,[]);assert.deepEqual(b.data.items,[]);assert.match(a.headers.get('cache-control'),/no-store/);
+const aSave=await call('owner',{projectId:'consentside',hidden:true,expectedRevision:0});assert.equal(aSave.status,200);assert.equal(aSave.data.items[0].revision,1);assert.equal((await call('owner')).data.items[0].hidden,true);
+const stale=await call('owner',{projectId:'consentside',hidden:false,expectedRevision:0});assert.equal(stale.status,409);assert.equal(stale.data.items[0].hidden,true);
+const different=await call('owner',{projectId:'orgbrain',hidden:true,expectedRevision:0});assert.equal(different.status,200);assert.equal(different.data.items.length,2);
+const restored=await call('owner',{projectId:'consentside',hidden:false,expectedRevision:1});assert.equal(restored.status,200);assert.equal(restored.data.items.find(x=>x.projectId==='consentside').revision,2);assert.equal(restored.data.items.find(x=>x.projectId==='orgbrain').hidden,true);
+assert.deepEqual((await call('other-user')).data.items,[]);await call('other-user',{projectId:'localoud',hidden:true,expectedRevision:0});assert.equal((await call('owner')).data.items.length,2);
+assert.equal((await call(null)).status,401);assert.equal((await call(null,{projectId:'localoud',hidden:true,expectedRevision:0})).status,401);
+assert.equal((await call('owner',{projectId:'unknown',hidden:true,expectedRevision:0})).status,400);
+assert.equal((await call('owner',{projectId:'localoud',hidden:true,expectedRevision:0,userId:'other-user'})).status,400);
+assert.equal((await call('owner',{projectId:'localoud',hidden:true,expectedRevision:0},{headers:{origin:'https://evil.example'}})).status,403);
+assert.equal((await call('owner',{projectId:'localoud',hidden:true,expectedRevision:0},{headers:{'sec-fetch-site':'cross-site'}})).status,403);
+assert.equal((await call('owner',undefined,{env:{}})).status,503);
+const race=await Promise.all([call('owner',{projectId:'localoud',hidden:true,expectedRevision:0}),call('owner',{projectId:'localoud',hidden:false,expectedRevision:0})]);assert.deepEqual(race.map(x=>x.status).sort(),[200,409]);
+const future=await call('owner',{projectId:'orgbrain',hidden:false,expectedRevision:99});assert.equal(future.status,409);assert.equal(future.data.items.find(x=>x.projectId==='orgbrain').hidden,true);
+assert.equal(sql.prepare('SELECT COUNT(*) AS n FROM project_visibility').get().n,4);
+console.log('PASS: real SQLite migrations + prepared API; two same-user clients, other-user isolation, no identity body override, unauthorized, CSRF, unknown IDs, unavailable DB, conflict/race and per-item merge safety');

@@ -1,0 +1,7 @@
+-- TEST FIXTURE ONLY. Not a production migration. Drizzle generation is still blocked.
+CREATE TABLE chat_messages (id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, project_id TEXT NOT NULL, client_id TEXT NOT NULL, author TEXT NOT NULL, text TEXT NOT NULL, reply_to TEXT, task_id TEXT, created_at TEXT NOT NULL, UNIQUE(owner_id,project_id,client_id));
+CREATE INDEX chat_by_project ON chat_messages(owner_id,project_id,created_at,id);
+CREATE TABLE event_outbox (event_id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, project_id TEXT NOT NULL, message_id TEXT NOT NULL UNIQUE, event_name TEXT NOT NULL, state TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE TABLE board_tasks (id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, project_id TEXT NOT NULL, source_message_id TEXT NOT NULL, client_id TEXT NOT NULL, title TEXT NOT NULL, scope TEXT NOT NULL, action TEXT NOT NULL, state TEXT NOT NULL, priority INTEGER NOT NULL, priority_reason TEXT NOT NULL, dependencies_json TEXT NOT NULL, revision INTEGER NOT NULL, fence INTEGER NOT NULL, bound_task_ref TEXT, result_json TEXT, last_operation_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(owner_id,project_id,client_id));
+CREATE INDEX tasks_by_project ON board_tasks(owner_id,project_id,priority,created_at);
+CREATE TABLE task_operations (owner_id TEXT NOT NULL, operation_id TEXT NOT NULL, task_id TEXT NOT NULL, fingerprint TEXT NOT NULL, snapshot_json TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(owner_id,operation_id));

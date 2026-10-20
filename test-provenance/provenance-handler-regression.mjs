@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import {harness,root} from './harness.mjs';
+import {pathToFileURL} from 'node:url';
+
+let outbound=0;globalThis.fetch=async()=>{outbound++;throw Error('No network in offline review')};
+const {service,rpc,count}=await harness();const pid='astraharness';
+const {tools}=await import(pathToFileURL(root+'/worker/chat-handler.mjs'));
+const defs=new Map(tools.map(t=>[t.name,t]));
+for(const name of ['project_request_source_import','project_request_source_get','project_task_link_source'])assert(defs.has(name),name+' missing from tool catalog');
+assert.equal(defs.get('project_request_source_get').annotations.readOnlyHint,true);
+assert.equal(defs.get('project_request_source_import').annotations.readOnlyHint,false);
+assert.equal(defs.get('project_task_link_source').annotations.readOnlyHint,false);
+for(const name of ['project_request_source_import','project_task_link_source'])assert.equal(defs.get(name).inputSchema.additionalProperties,false);
+assert.equal(new Set(tools.map(t=>t.name)).size,tools.length);
+
+const body={projectId:pid,roomId:'review_room_0001',messageId:'review_main_message_0001',createdAt:'2026-10-08T00:00:00Z',text:'Synthetic original main-chat request',mode:'standard',context:[]};
+const ok=result=>{assert.equal(result.status,200);assert(!result.data.result?.isError,JSON.stringify(result));return result.data.result.structuredContent.data};
+const error=(result,code)=>{assert.equal(result.status,200);assert.equal(result.data.result.isError,true);assert.equal(result.data.result.structuredContent.error,code)};
+assert.equal((await rpc('project_request_source_import',body,null)).status,401);
+assert.equal((await rpc('project_request_source_import',body,'review_owner',{origin:'https://dashboard.example'})).status,403);
+error(await rpc('project_request_source_import',{...body,owner_id:'review_other'}),'invalid_external_source');
+const source=ok(await rpc('project_request_source_import',body));assert.equal(source.kind,'main_chat');assert.equal(source.executionAuthorization,'none');assert(!('owner_id' in source));
+assert.equal(ok(await rpc('project_request_source_import',body)).id,source.id);
+error(await rpc('project_request_source_get',{sourceId:source.id},'review_other'),'source_not_found');
+assert.deepEqual(ok(await rpc('project_request_source_get',{sourceId:source.id})).relatedTaskIds,[]);
+error(await rpc('project_message_get',{messageId:source.id}),'message_not_found');
+error(await rpc('project_notify_message',{projectId:pid,messageId:source.id}),'message_not_found');
+error(await rpc('project_dot_reply',{projectId:pid,clientId:'review_forged_reply',replyTo:source.id,text:'Forbidden copied reply'}),'message_not_found');
+assert.equal(count('chat_messages'),0);assert.equal(count('event_outbox'),0);
+
+const create={projectId:pid,clientId:'review_rpc_task_001',sourceMessageId:source.id,title:'Existing imported task',scope:'Synthetic plan',action:'proposed',priority:50,priorityReason:'Synthetic',dependencies:[]};
+const task=ok(await rpc('project_task_create',create));assert.equal(task.requestSource.id,source.id);assert.equal(task.action,'proposed');
+error(await rpc('project_task_create',{...create,clientId:'review_rpc_execute',action:'investigate_report'}),'imported_source_registration_only');
+error(await rpc('project_task_advance',{taskId:task.id,operationId:'review_rpc_claim',expectedRevision:1,fence:0,state:'claimed'}),'imported_source_registration_only');
+const next=ok(await rpc('project_request_source_import',{...body,messageId:'review_main_message_0002',text:'Synthetic followup',mode:'plan_only'}));
+const link={taskId:task.id,sourceId:next.id,note:'Followup to the same task',expectedRevision:1,operationId:'review_rpc_link_001'};
+const result=ok(await rpc('project_task_link_source',link));assert.equal(result.task.id,task.id);assert.equal(result.task.revision,2);assert.equal(result.task.source_message_id,source.id);assert.equal(result.task.linkedSources[0].id,next.id);
+assert.deepEqual(ok(await rpc('project_request_source_get',{sourceId:next.id})).relatedTaskIds,[task.id]);
+const listed=ok(await rpc('project_tasks_list',{projectId:pid}));assert.equal(listed.length,1);assert(!('owner_id' in listed[0]));assert.equal(listed[0].requestSource.id,source.id);assert.equal(listed[0].linkedSources[0].id,next.id);
+assert.equal(count('board_tasks'),1);assert.equal(count('chat_messages'),0);assert.equal(count('event_outbox'),0);assert.equal((await service.pendingMessages()).messages.length,0);assert.equal(outbound,0);
+console.log('PASS: new tool catalog, authenticated MCP import/get/create/link/readback, owner rejection, browser-origin rejection, no authorization promotion, no fake message/reply/receipt/notification, no duplicate task, no outbound requests');

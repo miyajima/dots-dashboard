@@ -1,0 +1,348 @@
+{
+  "version": 2,
+  "synthetic": true,
+  "actual_provider_calls": 0,
+  "actual_dashboard_calls": 0,
+  "actual_native_task_config_lookups": 0,
+  "config_example_provenance": "Synthetic offline examples only; no native validation",
+  "timestamp_unit": "epoch_seconds",
+  "cases": [
+    {
+      "name": "unknown-launch",
+      "payload": {
+        "version": 2,
+        "record": {
+          "teamId": "synthetic-team",
+          "operationId": "unknown-launch",
+          "expectedRevision": 7,
+          "stepId": "synthetic-implementation",
+          "fence": 1,
+          "state": "launch_unknown",
+          "observedAt": "2026-10-11T12:00:00.125000Z",
+          "summary": "Astra current execution/evidence state",
+          "blocker": null,
+          "evidence": []
+        },
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": "dispatch_synthetic_2aec320c",
+          "attemptId": "attempt_synthetic_602c43a7",
+          "executionId": null,
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": null,
+          "executionIdentityStatus": "not_observed",
+          "exactCommit": null,
+          "exactTree": null,
+          "hostRevision": 0,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "worker"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": false,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": []
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema"
+      }
+    },
+    {
+      "name": "instance-observed",
+      "payload": {
+        "version": 2,
+        "record": {
+          "teamId": "synthetic-team",
+          "operationId": "instance-observed",
+          "expectedRevision": 8,
+          "stepId": "synthetic-implementation",
+          "fence": 1,
+          "state": "launch_unknown",
+          "observedAt": "2026-10-11T12:00:00.125000Z",
+          "summary": "Astra current execution/evidence state",
+          "blocker": null,
+          "evidence": []
+        },
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": "dispatch_synthetic_2aec320c",
+          "attemptId": "attempt_synthetic_602c43a7",
+          "executionId": null,
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": null,
+          "executionIdentityStatus": "not_observed",
+          "exactCommit": null,
+          "exactTree": null,
+          "hostRevision": 0,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "worker"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": false,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": [],
+          "environmentInstanceId": "synthetic~instance-1"
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema"
+      }
+    },
+    {
+      "name": "receipt-not-completion",
+      "payload": {
+        "version": 2,
+        "record": {
+          "teamId": "synthetic-team",
+          "operationId": "receipt-not-completion",
+          "expectedRevision": 9,
+          "stepId": "synthetic-implementation",
+          "fence": 1,
+          "state": "verifying",
+          "observedAt": "2026-10-11T12:00:00.125000Z",
+          "summary": "Astra current execution/evidence state",
+          "blocker": null,
+          "evidence": [
+            {
+              "kind": "artifact",
+              "commit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+              "tree": "e008171012426e7a3a056cfde77e0490822515cf"
+            }
+          ]
+        },
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": "dispatch_synthetic_2aec320c",
+          "attemptId": "attempt_synthetic_602c43a7",
+          "executionId": "execution-1",
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": "execution-1",
+          "executionIdentityStatus": "observed",
+          "exactCommit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+          "exactTree": "e008171012426e7a3a056cfde77e0490822515cf",
+          "hostRevision": 5,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "worker"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": false,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": [],
+          "environmentInstanceId": "synthetic~instance-1"
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema"
+      }
+    },
+    {
+      "name": "implementation-handoff",
+      "payload": {
+        "version": 2,
+        "record": {
+          "teamId": "synthetic-team",
+          "operationId": "implementation-handoff",
+          "expectedRevision": 10,
+          "stepId": "synthetic-implementation",
+          "fence": 1,
+          "state": "succeeded",
+          "observedAt": "2026-10-11T12:00:00.125000Z",
+          "summary": "Astra current execution/evidence state",
+          "blocker": null,
+          "evidence": [
+            {
+              "kind": "artifact",
+              "commit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+              "tree": "e008171012426e7a3a056cfde77e0490822515cf"
+            },
+            {
+              "kind": "check",
+              "sha256": "9264b4262f90b2f1c898a9f5a05f7cc4cb611497a056f3bdd80311dd1f2c4ce1",
+              "actor": "worker"
+            }
+          ]
+        },
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": "dispatch_synthetic_2aec320c",
+          "attemptId": "attempt_synthetic_602c43a7",
+          "executionId": "execution-1",
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": "execution-1",
+          "executionIdentityStatus": "observed",
+          "exactCommit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+          "exactTree": "e008171012426e7a3a056cfde77e0490822515cf",
+          "hostRevision": 5,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "worker"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": false,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": [],
+          "environmentInstanceId": "synthetic~instance-1"
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema"
+      }
+    },
+    {
+      "name": "unstarted-verifier",
+      "payload": {
+        "version": 2,
+        "record": null,
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": null,
+          "attemptId": null,
+          "executionId": null,
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": "execution-1",
+          "executionIdentityStatus": "verifier_execution_unobserved",
+          "exactCommit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+          "exactTree": "e008171012426e7a3a056cfde77e0490822515cf",
+          "hostRevision": 0,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "reviewer"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": false,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": []
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema",
+        "reason": "independent_verifier_result_not_observed"
+      }
+    },
+    {
+      "name": "independent-verifier-completion",
+      "payload": {
+        "version": 2,
+        "record": {
+          "teamId": "synthetic-team",
+          "operationId": "independent-verifier-completion",
+          "expectedRevision": 12,
+          "stepId": "synthetic-verifier",
+          "fence": 1,
+          "state": "succeeded",
+          "observedAt": "2026-10-11T12:00:00.125000Z",
+          "summary": "Astra current execution/evidence state",
+          "blocker": null,
+          "evidence": [
+            {
+              "kind": "artifact",
+              "commit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+              "tree": "e008171012426e7a3a056cfde77e0490822515cf"
+            },
+            {
+              "kind": "check",
+              "sha256": "9264b4262f90b2f1c898a9f5a05f7cc4cb611497a056f3bdd80311dd1f2c4ce1",
+              "actor": "worker"
+            },
+            {
+              "kind": "check",
+              "sha256": "c201c5bc41b0656f5ffca159b27d5ed486fdd87db232610ffe965900cb700262",
+              "actor": "reviewer"
+            },
+            {
+              "kind": "independent_verdict",
+              "sha256": "7cdb60a33e5962220afd92605221379d42f6a46e7fe07759768ddbfce1ddbb54",
+              "actor": "reviewer"
+            },
+            {
+              "kind": "verifier_host_observation",
+              "sha256": "30d5cadf4ad3e626328be94634e4fd5e95dde067e7b54a78d1d94b8072973294",
+              "actor": "reviewer"
+            }
+          ]
+        },
+        "cloudRun": {
+          "runId": "run_synthetic_c78fb339",
+          "specSha256": "0207b8b341669ce7ac6ed1a24a4060d7c03915f85c96082c2e119969b073ed9a",
+          "generation": 1,
+          "dispatchId": "dispatch_synthetic_c9815f59",
+          "attemptId": "attempt_synthetic_f6869293",
+          "executionId": "verifier-execution-1",
+          "targetDispatchId": "dispatch_synthetic_2aec320c",
+          "targetAttemptId": "attempt_synthetic_602c43a7",
+          "implementationExecutionId": "execution-1",
+          "executionIdentityStatus": "verifier_execution_observed",
+          "exactCommit": "1e1eac672f7eb766cd6add126fbb482e3c85abba",
+          "exactTree": "e008171012426e7a3a056cfde77e0490822515cf",
+          "hostRevision": 8,
+          "gate": null,
+          "binding": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "reviewer"
+          },
+          "lead": {
+            "environmentConfigId": "workspace_fixture~asenvcfg_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "executorType": "cloud",
+            "taskId": "lead"
+          },
+          "executionMode": "cloud",
+          "unitComplete": true,
+          "observedAtEpochSeconds": 1791720000.125,
+          "timestampUnit": "epoch_seconds",
+          "judgments": []
+        },
+        "transport": "Prepared contract, not a dashboard tool invocation; receiver validates its exact schema"
+      }
+    }
+  ],
+  "schema_provenance": "bundled-schema"
+}

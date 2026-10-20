@@ -1,0 +1,62 @@
+import {ServiceError} from './chat-task-service.mjs';
+const assert=(ok,status,code)=>{if(!ok)throw new ServiceError(status,code)};
+const parse=(s,fallback)=>{try{return s?JSON.parse(s):fallback}catch{return fallback}};
+const lines=v=>Array.isArray(v)?v.filter(x=>typeof x==='string'&&x.trim()).slice(0,10):[];
+const validTime=t=>typeof t==='string'&&Number.isFinite(Date.parse(t));
+const latest=xs=>xs.filter(validTime).sort((a,b)=>Date.parse(b)-Date.parse(a))[0]||null;
+const clean=(x,n)=>typeof x==='string'&&x.trim().length>0&&x.length<=n;
+const id=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(x);
+const labels={queued:'未着手',claimed:'開始準備',running:'作業中',verifying:'検証中',waiting_input:'入力・確認待ち',failed:'要対応',succeeded:'成功記録あり'};
+export function deriveStatus(projectId,rows,outcomes,curated,checkedAt){
+ const bySource=new Map();for(const r of outcomes)if(!bySource.has(r.sourceMessageId))bySource.set(r.sourceMessageId,r);
+ const tasks=rows.map(t=>{const result=parse(t.result_json,null),ext=lines(parse(t.external_evidence_json,[])),evidence=ext.length?ext:lines(result?.evidence).length?lines(result.evidence):lines(parse(t.progress_evidence_json,[]));
+  const completionKind=t.source_mode==='plan_only'?'plan':t.action==='investigate_report'?'report':bySource.get(t.source_message_id)?.kind||'unknown';
+  const observed=ext.length?t.external_observed_at:result?.evidence?.length?t.result_observed_at:t.progress_verified_at;const observedAt=evidence.length&&validTime(observed)?new Date(observed).toISOString():null;
+  const completionVerified=t.state==='succeeded'&&evidence.length>0&&!!observedAt;
+  return {id:t.id,title:t.title,state:t.state,label:labels[t.state]||'未確認',parentTaskId:t.parent_task_id||null,summary:t.external_summary||result?.summary||'',observedAt,evidence,revision:t.revision,updatedAt:t.updated_at,completionKind,completionVerified,effectiveComplete:false,sourceMessageId:t.source_message_id,priority:t.priority};
+ });
+ const map=new Map(tasks.map(t=>[t.id,t])),children=new Map();for(const t of tasks)if(t.parentTaskId){const list=children.get(t.parentTaskId)||[];list.push(t);children.set(t.parentTaskId,list)}
+ const complete=(t,seen=new Set())=>{if(seen.has(t.id))return false;const next=new Set(seen).add(t.id);return t.completionVerified&&t.completionKind==='work'&&(!t.parentTaskId||map.has(t.parentTaskId))&&(children.get(t.id)||[]).every(c=>complete(c,next))};
+ for(const t of tasks)t.effectiveComplete=complete(t);
+ const counts={total:tasks.length,queued:0,active:0,waiting:0,failed:0,succeeded:0,unfinished:0,verifiedCompleted:0,unverified:0};
+ for(const t of tasks){if(t.state==='queued')counts.queued++;if(['claimed','running','verifying'].includes(t.state))counts.active++;if(t.state==='waiting_input')counts.waiting++;if(t.state==='failed')counts.failed++;if(t.state==='succeeded')counts.succeeded++;if(t.effectiveComplete)counts.verifiedCompleted++;else counts.unfinished++;if(!t.observedAt)counts.unverified++}
+ const activityUpdatedAt=latest([...tasks.map(t=>t.updatedAt),...outcomes.map(r=>r.recordedAt)]),latestEvidenceAt=latest([...tasks.map(t=>t.observedAt),...outcomes.map(r=>r.observedAt)]);
+ if(curated)curated={...curated,stale:!!activityUpdatedAt&&Date.parse(activityUpdatedAt)>Date.parse(curated.recordedAt)};
+ let state='unconfirmed',label='未確認',headline='現在の進捗を確認できる記録はまだありません';
+ if(counts.waiting||counts.failed){state='attention';label='確認待ち';headline=`入力・確認待ち ${counts.waiting}件、要対応 ${counts.failed}件`}
+ else if(counts.active){state='running';label='作業・検証中';headline=`開始準備・作業・検証中 ${counts.active}件`}
+ else if(counts.queued){state='queued';label='未着手';headline=`登録済み・未着手 ${counts.queued}件`}
+ else if(tasks.length||outcomes.length||curated){state='recorded';label='記録あり';headline='確認済みの記録があります。完了範囲は個別の根拠を確認してください'}
+ const pending=tasks.filter(t=>!t.effectiveComplete),order={waiting_input:0,failed:1,verifying:2,running:3,claimed:4,queued:5,succeeded:6};pending.sort((a,b)=>(order[a.state]??7)-(order[b.state]??7)||a.priority-b.priority||a.id.localeCompare(b.id));
+ const focus=pending[0];let blocker=focus?`${focus.label}：${focus.title}${focus.summary?'。'+focus.summary:''}`:'未完了の作業は記録されていません。プロジェクト全体の完了を意味しません';
+ if(!tasks.length)blocker='タスクは未登録です。未登録の作業や外部の最新状態は確認できません';
+ if(focus?.state==='succeeded')blocker='成功したタスクの範囲・子タスク、計画／報告と実作業の区別を確認してください：'+focus.title;
+ const next=focus?({waiting_input:'必要な入力・確認内容を該当タスクで確認する',failed:'失敗の根拠と再開条件を確認する',verifying:'残る検証とその結果を記録する',running:'実際の作業結果を確認して進捗を記録する',claimed:'作業が実際に始まったか確認する',queued:'対象・依存関係・必要な承認を確認して着手を判断する',succeeded:'成功範囲と未完の子タスクを確認する'}[focus.state]||'根拠を確認する')+'：'+focus.title:'新しい進捗があれば根拠付きで記録する';
+ tasks.sort((a,b)=>(order[a.state]??7)-(order[b.state]??7)||Date.parse(b.updatedAt)-Date.parse(a.updatedAt)||a.id.localeCompare(b.id));
+ return {projectId,checkedAt,activityUpdatedAt,latestEvidenceAt,state,label,headline,blocker,next,counts,tasks:tasks.slice(0,30),tasksTruncated:tasks.length>30,outcomes:outcomes.slice(0,12),curated};
+}
+export function createProjectStatus({db,owner,projects,service,teams=null,clock=()=>new Date().toISOString()}){
+ const all=async(sql,args=[])=>(await db.prepare(sql).bind(...args).all()).results||[];
+ const project=p=>assert(projects.includes(p),404,'unknown_project');
+ const readRows=async(p)=>all(`SELECT t.*,COALESCE(m.mode,s.mode,'unknown') AS source_mode,e.observed_at AS external_observed_at,e.summary AS external_summary,e.evidence_json AS external_evidence_json,(SELECT MIN(o.created_at) FROM task_operations o WHERE o.owner_id=t.owner_id AND o.task_id=t.id AND json_extract(o.snapshot_json,'$.state')='succeeded' AND json_extract(o.snapshot_json,'$.result_json')=t.result_json) AS result_observed_at FROM board_tasks t LEFT JOIN chat_messages m ON m.owner_id=t.owner_id AND m.project_id=t.project_id AND m.id=t.source_message_id LEFT JOIN external_request_sources s ON s.owner_id=t.owner_id AND s.project_id=t.project_id AND s.id=t.source_message_id LEFT JOIN external_task_progress e ON e.owner_id=t.owner_id AND e.task_id=t.id WHERE t.owner_id=?${p?' AND t.project_id=?':''} ORDER BY t.updated_at DESC,t.id`,p?[owner,p]:[owner]);
+ const readOutcomes=async(p)=>(await all(`SELECT r.* FROM request_results r JOIN chat_messages m ON m.owner_id=r.owner_id AND m.project_id=r.project_id AND m.id=r.reply_message_id WHERE r.owner_id=?${p?' AND r.project_id=?':''} ORDER BY m.rowid DESC,r.id`,p?[owner,p]:[owner])).map(r=>({id:r.id,projectId:r.project_id,status:r.status,kind:r.kind,summary:r.summary,observedAt:r.observed_at,recordedAt:r.recorded_at,evidence:lines(parse(r.evidence_json,[])),sourceMessageId:r.source_message_id,replyMessageId:r.reply_message_id}));
+ const serialize=r=>r?{summary:r.summary,achievement:r.achievement,blocker:r.blocker,next:r.next_step,observedAt:r.observed_at,recordedAt:r.recorded_at,revision:r.revision,sourceMessageId:r.source_message_id,evidence:parse(r.evidence_json,[]).flatMap(x=>x.evidence),references:parse(r.evidence_json,[]).map(({evidence,...x})=>x)}:null;
+ const readCurated=async(p)=>all(`SELECT r.* FROM project_status_records r WHERE r.owner_id=?${p?' AND r.project_id=?':''} AND r.revision=(SELECT MAX(n.revision) FROM project_status_records n WHERE n.owner_id=r.owner_id AND n.project_id=r.project_id)`,p?[owner,p]:[owner]);
+ const read=async(p)=>{if(p)project(p);const [rows,outcomes,curated]=await Promise.all([readRows(p),readOutcomes(p),readCurated(p)]),checkedAt=clock();const build=async pid=>({...deriveStatus(pid,rows.filter(t=>t.project_id===pid),outcomes.filter(r=>r.projectId===pid),serialize(curated.find(r=>r.project_id===pid)),checkedAt),...(teams?{agentTeams:await teams.list(pid)}:{})});return p?build(p):{checkedAt,projects:await Promise.all(projects.map(build))}};
+ return {read,async record(projectId,input){
+  project(projectId);const keys=['sourceMessageId','operationId','expectedRevision','summary','achievement','blocker','next','observedAt','references'];
+  assert(input&&Object.keys(input).length===keys.length&&Object.keys(input).every(k=>keys.includes(k))&&id(input.sourceMessageId)&&id(input.operationId)&&Number.isSafeInteger(input.expectedRevision)&&input.expectedRevision>=0&&['summary','achievement','blocker','next'].every(k=>clean(input[k],1000))&&Array.isArray(input.references)&&input.references.length>0&&input.references.length<=8,400,'invalid_status_record');
+  assert(validTime(input.observedAt)&&Date.parse(input.observedAt)<=Date.parse(clock())+300000,400,'invalid_status_time');
+  assert(input.references.every(r=>r&&Object.keys(r).every(k=>['kind','id','revision'].includes(k))&&id(r.id)&&['task','result'].includes(r.kind)),400,'invalid_status_reference');
+  const references=input.references.map(r=>({kind:r.kind,id:r.id,...(r.revision===undefined?{}:{revision:r.revision})})).sort((a,b)=>a.kind.localeCompare(b.kind)||a.id.localeCompare(b.id));assert(new Set(references.map(r=>r.kind+':'+r.id)).size===references.length,400,'duplicate_status_reference');
+  const observedAt=new Date(input.observedAt).toISOString(),fingerprint=JSON.stringify([projectId,input.sourceMessageId,input.operationId,input.expectedRevision,input.summary,input.achievement,input.blocker,input.next,observedAt,references]);
+  const prior=(await all('SELECT * FROM project_status_records WHERE owner_id=? AND operation_id=?',[owner,input.operationId]))[0];if(prior){assert(prior.project_id===projectId&&prior.fingerprint===fingerprint,409,'operation_id_reused');return {record:serialize(prior),replayed:true}}
+  const source=await service.requestSource(input.sourceMessageId);assert(source.project_id===projectId&&source.metadata.mode==='standard',409,'status_source_must_be_standard');assert(Date.parse(observedAt)>=Date.parse(source.createdAt),400,'invalid_status_time');
+  const refs=[];for(const r of references){assert(r&&Object.keys(r).every(k=>['kind','id','revision'].includes(k))&&id(r.id)&&['task','result'].includes(r.kind),400,'invalid_status_reference');
+   if(r.kind==='task'){assert(Number.isSafeInteger(r.revision),400,'task_revision_required');const t=await service.getTask(r.id);assert(t.project_id===projectId&&t.revision===r.revision,409,'status_evidence_changed');const evidence=lines(t.externalProgress?.evidence).length?lines(t.externalProgress.evidence):lines(t.result?.evidence).length?lines(t.result.evidence):lines(t.progressEvidence);const evidenceRows=await readRows(projectId),evidenceRow=evidenceRows.find(x=>x.id===t.id);const at=t.externalProgress?.evidence?.length?t.externalProgress.observedAt:t.result?.evidence?.length?evidenceRow?.result_observed_at:t.progress_verified_at;assert(evidence.length&&validTime(at)&&Date.parse(at)<=Date.parse(observedAt),400,'status_evidence_required');refs.push({kind:'task',id:r.id,revision:t.revision,state:t.state,observedAt:at,evidence})}
+   else {assert(r.revision===undefined,400,'invalid_status_reference');const result=(await readOutcomes(projectId)).find(x=>x.id===r.id);assert(result&&result.evidence.length&&Date.parse(result.observedAt)<=Date.parse(observedAt),400,'status_evidence_required');refs.push({kind:'result',id:r.id,resultKind:result.kind,status:result.status,observedAt:result.observedAt,evidence:result.evidence})}
+  }
+  const now=clock(),taskRefs=refs.filter(r=>r.kind==='task'),revisionChecks=taskRefs.map(()=>" AND EXISTS(SELECT 1 FROM board_tasks WHERE owner_id=? AND project_id=? AND id=? AND revision=?)").join('');const written=await db.prepare('INSERT INTO project_status_records(owner_id,project_id,revision,operation_id,source_message_id,summary,achievement,blocker,next_step,observed_at,recorded_at,evidence_json,fingerprint) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,? WHERE COALESCE((SELECT MAX(revision) FROM project_status_records WHERE owner_id=? AND project_id=?),0)=?'+revisionChecks+' ON CONFLICT DO NOTHING').bind(owner,projectId,input.expectedRevision+1,input.operationId,input.sourceMessageId,input.summary,input.achievement,input.blocker,input.next,observedAt,now,JSON.stringify(refs),fingerprint,owner,projectId,input.expectedRevision,...taskRefs.flatMap(r=>[owner,projectId,r.id,r.revision])).run();
+  const saved=(await all('SELECT * FROM project_status_records WHERE owner_id=? AND operation_id=?',[owner,input.operationId]))[0];if(saved){assert(saved.project_id===projectId&&saved.fingerprint===fingerprint,409,'operation_id_reused');return {record:serialize(saved),replayed:!Number(written.meta?.changes)}}throw new ServiceError(409,'stale_status_revision');
+ }};
+}
